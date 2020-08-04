@@ -1,0 +1,11 @@
+{
+  "name": "frontedn_react",
+  "version": "1.0.0",
+  "description": "frontend_part_of_the_mern_app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pawel_Karas",
+  "license": "ISC"
+}
