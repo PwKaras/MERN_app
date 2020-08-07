@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
-import './App.css';
 import Users from './user/views/Users';
 import NewPlaces from './places/views/NewPlaces';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
+import './App.css';
+import UserPlaces from './places/views/UserPlaces';
 
 const App = () => {
   return (
@@ -13,6 +14,9 @@ const App = () => {
         <Switch>
           <Route path="/" exact>
             <Users />
+          </Route>
+          <Route path="/:userId/places" exact>
+            <UserPlaces />
           </Route>
           <Route path="/places/new" exact>
             <NewPlaces />
