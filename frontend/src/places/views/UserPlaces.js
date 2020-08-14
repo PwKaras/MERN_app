@@ -32,7 +32,7 @@ const DEF_PLACES = [
 const UserPlaces = () => {
     const userId = useParams().userId;
     const loadedPlaces = DEF_PLACES.filter(place => place.creator === userId);
-    return <PlaceList items={loadedPlaces} />;
+    return <PlaceList items={loadedPlaces} />; 
 };
 
 export default UserPlaces;
