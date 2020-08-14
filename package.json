@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "serialize-javascript": "^4.0.0"
+  }
+}
