@@ -7,11 +7,11 @@ const DEF_PLACES = [
         id: 'p1',
         title: 'Ellery Creek Big Hole',
         description: 'The best place in Outback',
-        imageUrl: 'https://picsum.photos/200',
+        imageUrl: 'https://i0.wp.com/www.erldundaroadhouse.com/dsrtks-content/uploads/2016/04/Ellery-Creek-Big-Hole.jpg?ssl=1',
         address: 'Namatjira NT 0872, Australia',
         location: {
-            lat: -23.9688475,
-            lng: 132.4374386
+            lat: -23.7771692,
+            lng: 133.0735555
         },
         creator: 'u1'
     },
