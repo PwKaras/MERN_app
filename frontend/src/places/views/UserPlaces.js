@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import PlaceList from '../components/PlaceList';
 
-const DEF_PLACES = [
+export const DEF_PLACES = [
     {
         id: 'p1',
         title: 'Ellery Creek Big Hole',
