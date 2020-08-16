@@ -6,6 +6,10 @@ const formReducer = (state, action) => {
         case 'INPUT_CHANGE':
             let formIsValid = true;
             for (const inputId in state.inputs) {
+                if(!state.inputs[inputId]) {
+                    continue
+                    // continue tells Javascript if state in inputId are undefine don't continue with this iteration - skip to the next
+                }
                 if (inputId === action.inputId) {
                     formIsValid = formIsValid && action.isValid;
                 }
@@ -24,10 +28,19 @@ const formReducer = (state, action) => {
                 },
                 isValid: formIsValid
             };
+            case 'SET_DATA':
+            return {
+                // dotn`t copy old state (...state) because replace it entirely
+                inputs: action.inputs,
+                isValid: action.formIsValid
+
+            }
+
         default:
             return state;
     }
 };
+
 export const useForm = (initialInputs, initialFormValidity) => {
 
     // taked from NewPlaces.js
@@ -62,5 +75,13 @@ export const useForm = (initialInputs, initialFormValidity) => {
         })
     }, []);
 
-    return [formState, inputHandler];
+    const setFormData = useCallback((inputData, formValidity) => {
+        dispatch({
+            type: 'SET_DATA',
+            inputs: inputData,
+            formIsValid: formValidity
+        });
+    }, []);
+
+    return [formState, inputHandler, setFormData];
 };
