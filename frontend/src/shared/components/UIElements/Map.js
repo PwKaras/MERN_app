@@ -5,7 +5,7 @@ const Map = props => {
     const mapRef = useRef();
 
     // object destructuring - take center and zoom from props
-    const { center, zoom } = props
+    const { center, zoom } = props;
 
     useEffect(() => {
         // acces to maps by window
@@ -15,7 +15,9 @@ const Map = props => {
             zoom: zoom
         });
         // creating marker in center of the map  
-        new window.google.maps.Marker({ position: center, map: map });
+        new window.google.maps.Marker({ 
+            position: center, 
+            map: map });
     }, [center, zoom]);
 
 
@@ -23,7 +25,6 @@ const Map = props => {
         <div ref={mapRef}
             className={`map ${props.className}`}
             style={props.style}>
-
         </div>
     );
 };

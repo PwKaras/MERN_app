@@ -22,8 +22,8 @@ export const DEF_PLACES = [
         imageUrl: 'https://picsum.photos/200',
         address: 'Namatjira NT 0872, Australia',
         location: {
-            lat: -23.9688475,
-            lng: 132.4374386
+            lat: 40.7484405,
+            lng: -73.9878584
         },
         creator: 'u2'
     }

@@ -72,8 +72,7 @@ const UpdatePlace = () => {
                     </h2></Card>
             </div>
         )
-
-    }
+    };
 
     if (isLoading) {
         return (
