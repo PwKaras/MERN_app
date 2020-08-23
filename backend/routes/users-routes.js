@@ -1,28 +1,29 @@
-// const express = require('express');
-// const router = express.Router();
+const express = require('express');
 
-// const USERS = [
-//     {
-//         id: 'u1',
-//         name: 'Pawel',
-//         image: 'https://picsum.photos/200',
-//         placeCount: 3
-//     },
-//     {
-//         id: 'u2',
-//         name: 'John',
-//         image:'https://picsum.photos/200',
-//         placeCount: 2
-//     }
-// ];
+const { check } = require('express-validator');
 
-// router.get('/:uid', (req, res, next) => {
-//     const userId = req.params.uid;
-//     const user = USERS.find(u => {
-//         return u.id === userId
-//     });
-//     res.json({user: user});
-// });
+const usersControlers = require('../controllers/users-controllers');
 
+const router = express.Router();
 
-// module.exports = router;
+router.get('/', usersControlers.getUsers);
+
+router.post('/singup',
+    [
+        check('name')
+            .not()
+            .isEmpty()
+            .withMessage('Must be not empty'),
+        check('email')
+            .normalizeEmail()
+            .isEmail()
+            .withMessage('Pease enter valid e-mail.'),
+        check('password')
+            .isLength({ min: 8 })
+            .withMessage('Must contain at least 8 characters')
+            .matches(/\d/).withMessage('must contain a number')
+    ], usersControlers.singup);
+
+router.post('/login', usersControlers.login);
+
+module.exports = router;
