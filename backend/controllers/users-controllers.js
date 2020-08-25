@@ -1,4 +1,4 @@
-const { v4: uuid } = require('uuid');
+// const { v4: uuid } = require('uuid');
 
 const { validationResult } = require('express-validator');
 
@@ -48,7 +48,7 @@ const singup = (req, res, next) => {
     };
 
     const createdUser = {
-        id: uuid(),
+        // id: uuid(),
         name,
         email,
         password,

@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyPraser = require('body-parser');
+const mongoose = require('mongoose');
+const mongoConnect = require('./config/mongo');
 
 
 const placesRoutes = require('./routes/places-routes');
@@ -31,4 +33,23 @@ app.use((error, req, res, next) => {
 });
 
 
-app.listen(5050);
+const PORT = process.env.PORT;
+const HOST = process.env.HOST;
+
+app.listen(PORT, HOST, () => {
+    console.log(`Listening on http://${HOST}:${PORT}`)
+});
+
+// mongoose.connect('mongodb+srv://pwkaras:ilVsyVTIPdL6ULTV@cluster0.asa7a.mongodb.net/places?retryWrites=true&w=majority',
+//     {
+//         useNewUrlParser: true,
+//         useUnifiedTopology: true
+//     })
+//     .then(
+//         () => {
+//             app.listen(5050);
+//         })
+//     .catch(
+//         err => {
+//             console.log(err);
+//         });
