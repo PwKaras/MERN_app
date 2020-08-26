@@ -8,7 +8,7 @@ const { validationResult } = require(`express-validator`);
 const HttpError = require('../models/http-error');
 
 const getCoordsForAddress = require('../util/location');
-const place = require('../models/place');
+// const place = require('../models/place');
 
 let DEF_PLACES = [
     {
@@ -49,8 +49,26 @@ let DEF_PLACES = [
     },
 ]
 
-const getAllPlaces = (req, res, next) => {
-    res.status(200).json({ places: DEF_PLACES });
+const getAllPlaces = async (req, res, next) => {
+    let places;
+    // const { limit, page } = req.query;
+    const limit = parseInt(req.query.limit);
+    const page = parseInt(req.query.page);
+
+    try {
+        places = await Place.find()
+            .limit(limit)
+            .skip(limit * (page - 1))
+    } catch (error) {
+        return next(new HttpError('Fetching places failed, please try again later.', 500));
+    };
+    if (!places || places.length === 0) {
+        return next(
+            new HttpError('Could not find any place.', 404)
+        );
+    };
+
+    res.status(200).json({ places: places.map(place => place.toObject({ getters: true })) });
 };
 
 const getPlacesById = async (req, res, next) => {
@@ -100,9 +118,10 @@ const updatePlacesById = async (req, res, next) => {
     // updatedPlace.description = newDescription;
     //assing succesfully changed data in copy, to existing object
     // DEF_PLACES[placeIndex] = updatedPlace;
+
     let place;
     try {
-        place = new Place.findById(placeId);
+        place = await Place.findById(placeId);
     } catch (error) {
         return next(new HttpError('Fetching places failed, please try again later.', 500));
     }
@@ -111,29 +130,35 @@ const updatePlacesById = async (req, res, next) => {
         return next(new HttpError('Could not find a place for the provided id.', 404));
     };
 
-    res.status(200).json({place, message: `Place has been updated successfully` });
+    res.status(200).json({ place: place.toObject({ getters: true }), message: `Place with id ${place.id} has been updated successfully` });
 };
 
 
-const deletePlacesById = (req, res, next) => {
+const deletePlacesById = async (req, res, next) => {
     //shorter way
     // const placeId = req.params.pid;
     // DEF_PLACES = DEF_PLACES.filter(p => { return p.id !== placeId });
     // res.status(200).json({ message: 'Place has been deleted' });
 
     const placeId = req.params.pid;
-    const place = DEF_PLACES.find(p => {
-        return p.id === placeId
-    });
+    // const place = DEF_PLACES.find(p => {
+    //     return p.id === placeId
+    // });
+    let place;
 
+    try {
+        place = await Place.deleteOne({ _id: placeId });
+    } catch (error) {
+        return next(new HttpError('Deleting places failed, please try again later.', 500))
+    }
     if (!place) {
         throw new HttpError('Could not find a place for the provided id.', 404);
         // return res.status(404).json({ message: 'Could not find a place for the provided id.' })
     };
 
-    const index = DEF_PLACES.indexOf(place);
-    DEF_PLACES.splice(index, 1);
-    res.status(200).json({ message: `Place with Id: ${place.id} has been deleted` });
+    // const index = DEF_PLACES.indexOf(place);
+    // DEF_PLACES.splice(index, 1);
+    res.status(200).json({ place: place.toObject({ getters: true }), message: `Place with Id: ${placeId} has been deleted` });
 };
 
 const getPlacesByUserId = async (req, res, next) => {
