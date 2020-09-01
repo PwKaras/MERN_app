@@ -5,24 +5,24 @@ const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
 
-const USERS = [
-    {
-        id: 'u1',
-        name: 'Pawel',
-        image: 'https://picsum.photos/200',
-        email: 'admin@admin.com',
-        password: 'admin123',
-        placeCount: 3
-    },
-    {
-        id: 'u2',
-        name: 'John',
-        image: 'https://picsum.photos/200',
-        email: 'john@test.com',
-        password: 'john1234',
-        placeCount: 2
-    }
-];
+// const USERS = [
+//     {
+//         id: 'u1',
+//         name: 'Pawel',
+//         image: 'https://picsum.photos/200',
+//         email: 'admin@admin.com',
+//         password: 'admin123',
+//         placeCount: 3
+//     },
+//     {
+//         id: 'u2',
+//         name: 'John',
+//         image: 'https://picsum.photos/200',
+//         email: 'john@test.com',
+//         password: 'john1234',
+//         placeCount: 2
+//     }
+// ];
 
 const defaultImage = 'https://picsum.photos/200';
 

@@ -22,11 +22,16 @@ const Auth = () => {
         }
     }, false);
 
-    const authSubminHandler = event => {
+    const authSubminHandler = async event => {
         event.preventDefault();
         console.log(formState.inputs);
         auth.login();
     };
+    // const authSubminHandler = event => {
+    //     event.preventDefault();
+    //     console.log(formState.inputs);
+    //     auth.login();
+    // };
     const switchModeHandler = () => {
         if (!isLoginMode) {
             setFormData(
@@ -43,7 +48,7 @@ const Auth = () => {
                         value: '',
                         isValid: false
                     }
-                }, 
+                },
                 false);
         }
         setIsLoginMode(prevState => !prevState);
@@ -75,8 +80,8 @@ const Auth = () => {
                     validators={[VALIDATOR_REQUIRE(), VALIDATOR_EMAIL()]}
                     errorText="Please enter a valid email address."
                     onInput={inputHandler}
-                    // initialValue={formState.inputs.email.value}
-                    // initialValid={formState.inputs.email.isValid}
+                // initialValue={formState.inputs.email.value}
+                // initialValid={formState.inputs.email.isValid}
                 />
                 <Input
                     id="password"
@@ -86,8 +91,8 @@ const Auth = () => {
                     validators={[VALIDATOR_REQUIRE(), VALIDATOR_MINLENGTH(8)]}
                     errorText="Please enter a valid password (at least 8 characters)."
                     onInput={inputHandler}
-                    // initialValue={formState.inputs.password.value}
-                    // initialValid={formState.inputs.password.isValid}
+                // initialValue={formState.inputs.password.value}
+                // initialValid={formState.inputs.password.isValid}
                 />
                 <Button type="submit" disabled={!formState.isValid}>
                     {isLoginMode ? "LOGIN" : "SINGUP"}

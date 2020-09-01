@@ -1,53 +1,56 @@
 // const uuid = require('uuid/v4');
 // const { v4: uuid } = require('uuid');
 
-const Place = require('../models/place');
 
 const { validationResult } = require(`express-validator`);
 
 const HttpError = require('../models/http-error');
 
 const getCoordsForAddress = require('../util/location');
-// const place = require('../models/place');
+const Place = require('../models/place');
+const User = require('../models/user');
+const mongooseUniqueValidator = require('mongoose-unique-validator');
+const mongoose = require('mongoose');
 
-let DEF_PLACES = [
-    {
-        id: 'p1',
-        title: 'Ellery Creek Big Hole',
-        description: 'The best place in Outback',
-        // imageUrl: 'https://i0.wp.com/www.erldundaroadhouse.com/dsrtks-content/uploads/2016/04/Ellery-Creek-Big-Hole.jpg?ssl=1',
-        address: 'Namatjira NT 0872, Australia',
-        location: {
-            lat: -23.7771692,
-            lng: 133.0735555
-        },
-        creator: 'u1'
-    },
-    {
-        id: 'p2',
-        title: 'Ellery Creek Big Hole_2',
-        description: 'The best place in Outback',
-        // imageUrl: 'https://picsum.photos/200',
-        address: 'Namatjira NT 0872, Australia',
-        location: {
-            lat: 40.7484405,
-            lng: -73.9878584
-        },
-        creator: 'u2'
-    },
-    {
-        id: 'p3',
-        title: 'Sydney',
-        description: 'Down Under biggest city',
-        // imageUrl: 'https://picsum.photos/200',
-        address: 'Sydney, Australia',
-        location: {
-            lat: -23.7771692,
-            lng: 133.0735555
-        },
-        creator: 'u1'
-    },
-]
+
+// let DEF_PLACES = [
+//     {
+//         id: 'p1',
+//         title: 'Ellery Creek Big Hole',
+//         description: 'The best place in Outback',
+//         // imageUrl: 'https://i0.wp.com/www.erldundaroadhouse.com/dsrtks-content/uploads/2016/04/Ellery-Creek-Big-Hole.jpg?ssl=1',
+//         address: 'Namatjira NT 0872, Australia',
+//         location: {
+//             lat: -23.7771692,
+//             lng: 133.0735555
+//         },
+//         creator: 'u1'
+//     },
+//     {
+//         id: 'p2',
+//         title: 'Ellery Creek Big Hole_2',
+//         description: 'The best place in Outback',
+//         // imageUrl: 'https://picsum.photos/200',
+//         address: 'Namatjira NT 0872, Australia',
+//         location: {
+//             lat: 40.7484405,
+//             lng: -73.9878584
+//         },
+//         creator: 'u2'
+//     },
+//     {
+//         id: 'p3',
+//         title: 'Sydney',
+//         description: 'Down Under biggest city',
+//         // imageUrl: 'https://picsum.photos/200',
+//         address: 'Sydney, Australia',
+//         location: {
+//             lat: -23.7771692,
+//             lng: 133.0735555
+//         },
+//         creator: 'u1'
+//     },
+// ]
 
 const getAllPlaces = async (req, res, next) => {
     let places;
@@ -133,55 +136,28 @@ const updatePlacesById = async (req, res, next) => {
     res.status(200).json({ place: place.toObject({ getters: true }), message: `Place with id ${place.id} has been updated successfully` });
 };
 
-
-const deletePlacesById = async (req, res, next) => {
-    //shorter way
-    // const placeId = req.params.pid;
-    // DEF_PLACES = DEF_PLACES.filter(p => { return p.id !== placeId });
-    // res.status(200).json({ message: 'Place has been deleted' });
-
-    const placeId = req.params.pid;
-    // const place = DEF_PLACES.find(p => {
-    //     return p.id === placeId
-    // });
-    let place;
-
-    try {
-        place = await Place.deleteOne({ _id: placeId });
-    } catch (error) {
-        return next(new HttpError('Deleting places failed, please try again later.', 500))
-    }
-    if (!place) {
-        throw new HttpError('Could not find a place for the provided id.', 404);
-        // return res.status(404).json({ message: 'Could not find a place for the provided id.' })
-    };
-
-    // const index = DEF_PLACES.indexOf(place);
-    // DEF_PLACES.splice(index, 1);
-    res.status(200).json({ place: place.toObject({ getters: true }), message: `Place with Id: ${placeId} has been deleted` });
-};
-
 const getPlacesByUserId = async (req, res, next) => {
     const userId = req.params.uid;
-    let places;
+    // let places;
     // const places = DEF_PLACES.filter(p => {
     //     return p.creator === userId
     // });
-
+    let userWithPlaces;
     try {
-        places = await Place.find({ creator: userId });
+        userWithPlaces = await User.findById(userId).populate('places');
+        // places = await Place.find({ creator: userId });
 
     } catch (error) {
         return next(new HttpError('Fetching places failed, please try again later.', 500));
     };
-    if (!places || places.length === 0) {
+    // if (!places || places.length === 0) {
+    if (!userWithPlaces || userWithPlaces.places.length === 0) {
         return next(
             new HttpError('Could not find a places for user with the provided id.', 404)
         );
-    };
-    res.status(200).json({ places: places.map(place => place.toObject({ getters: true })) });
+    }
+    res.status(200).json({ places: userWithPlaces.places.map(place => place.toObject({ getters: true })) });
 };
-
 
 const createPlace = async (req, res, next) => {
     const errors = validationResult(req);
@@ -210,9 +186,33 @@ const createPlace = async (req, res, next) => {
             image: 'https://picsum.photos/200',
             creator
         });
-    try {
-        await createdPlace.save();
 
+    let user;
+
+    try {
+        user = await User.findById({ _id: creator })
+    } catch (error) {
+        const err = res.status(500).json('Fetching user failed, please try again');
+        return next(err);
+    };
+
+    if (!user) {
+        const err = res.status(404).json('User with provided id don`t exist')
+        return next(err);
+    };
+
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        //creating unique Id 
+        await createdPlace.save({ session: sess });
+        //push not js, but mongoose - creating contection between two model and add only place id to user.places
+        user.places.push(createdPlace);
+        //save user only when is part of this current session
+        await user.save({ session: sess });
+        //in this places -commit changes are save only when all are successfull
+        await sess.commitTransaction();
+        //IMPORTANT - in MONGODB ATLAS - if don't exist collection - creating manually "+" 
     } catch (err) {
         const error = new HttpError('Creating place failed, please try again.', 500);
         // necessary to add this(return next()) to stop execute code in case error
@@ -220,7 +220,53 @@ const createPlace = async (req, res, next) => {
     }
     // DEF_PLACES.push(createdPlace);
     res.status(201).json({ place: createdPlace });
-}
+};
+
+const deletePlacesById = async (req, res, next) => {
+    //shorter way
+    // const placeId = req.params.pid;
+    // DEF_PLACES = DEF_PLACES.filter(p => { return p.id !== placeId });
+    // res.status(200).json({ message: 'Place has been deleted' });
+
+    const placeId = req.params.pid;
+    // const place = DEF_PLACES.find(p => {
+    //     return p.id === placeId
+    // });
+    let place;
+
+    try {
+        place = await Place.findById(placeId).populate('creator');
+        console.log(place);
+    } catch (error) {
+        const err = res.status(500).json('Fetching place failed, please try again');
+        return next(err);
+    };
+
+    if (!place) {
+        const err = res.status(404).json('Place with provided id don`t exist')
+        return next(err);
+    };
+
+
+    try {
+        const sess = await mongoose.startSession();
+        console.log(sess);
+        sess.startTransaction();
+        await place.deleteOne({ session: sess });
+        // pull - mongoose not js, automaticly remove id 
+        place.creator.places.pull(place);
+        await place.creator.save({ session: sess });
+        await sess.commitTransaction();
+    } catch (error) {
+        return next(new HttpError('Deleting places failed, please try again later.', 500))
+    };
+
+    // const index = DEF_PLACES.indexOf(place);
+    // DEF_PLACES.splice(index, 1);
+    // res.status(200).json({ message: 'Deleted place.' });
+    res.status(200).json({ place: place.toObject({ getters: true }), message: `Place with Id: ${placeId} has been deleted` });
+};
+
 
 exports.getAllPlaces = getAllPlaces;
 exports.getPlacesById = getPlacesById;
