@@ -13,6 +13,17 @@ const app = express();
 
 app.use(bodyPraser.json());
 
+// add this headers to all routes below
+app.use((req, res, next) => {
+    // allows any (*) domain to send request 
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // what headers this request send by the bowser may have
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    //which method
+    res.setHeader('Acces-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+    next()
+})
+
 app.use('/api/places', placesRoutes);
 app.use('/api/users', usersRouter);
 

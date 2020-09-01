@@ -44,7 +44,7 @@ const getUsers = async (req, res, next) => {
     res.status(200).json({ allUsers: users.map(user => user.toObject({ getters: true })) });
 };
 
-const singup = async (req, res, next) => {
+const signup = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -118,5 +118,5 @@ const login = async (req, res, next) => {
 // });
 
 exports.getUsers = getUsers;
-exports.singup = singup;
+exports.signup = signup;
 exports.login = login;

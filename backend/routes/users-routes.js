@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/', usersControlers.getUsers);
 
-router.post('/singup',
+router.post('/signup',
     [
         check('name')
             .not()
@@ -22,7 +22,7 @@ router.post('/singup',
             .isLength({ min: 8 })
             .withMessage('Must contain at least 8 characters')
             .matches(/\d/).withMessage('must contain a number')
-    ], usersControlers.singup);
+    ], usersControlers.signup);
 
 router.post('/login', usersControlers.login);
 
