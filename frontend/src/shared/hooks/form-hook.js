@@ -6,7 +6,7 @@ const formReducer = (state, action) => {
         case 'INPUT_CHANGE':
             let formIsValid = true;
             for (const inputId in state.inputs) {
-                if(!state.inputs[inputId]) {
+                if (!state.inputs[inputId]) {
                     continue
                     // continue tells Javascript if state in inputId are undefine don't continue with this iteration - skip to the next
                 }
@@ -28,7 +28,7 @@ const formReducer = (state, action) => {
                 },
                 isValid: formIsValid
             };
-            case 'SET_DATA':
+        case 'SET_DATA':
             return {
                 // dotn`t copy old state (...state) because replace it entirely
                 inputs: action.inputs,

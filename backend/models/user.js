@@ -8,7 +8,9 @@ const userSchema = new Schema({
     // unique: true - creat index to speeds up querying process
     email: { type: String, required: true, unique: true },
     // select: false - hide password from results
-    password: { type: String, required: true, minlength: 6, select: false, },
+    password: { type: String, required: true, minlength: 6, 
+        // select: false
+     },
     image: { type: String, required: true },
     places: [{ type: Schema.Types.ObjectId, required: true, ref: 'Place' }]
 });

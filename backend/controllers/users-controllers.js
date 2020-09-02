@@ -95,16 +95,16 @@ const login = async (req, res, next) => {
     } catch (error) {
         return next(new HttpError('Loggin failed, please try again later', 500))
 
-    }
+    };
     // const loggedUser = USERS.find(u => {
     //     return u.email === email && u.password === password
     // });
 
     if (!loggedUser || loggedUser.password !== password) {
         return next(
-            new HttpError('User email or password are not correct or not exist, crudential seems to be wrong', 401));
+            new HttpError('User email or password are not correct or not exist, crudential seems to be wrong.', 401));
     };
-
+    // res.json({ message: 'Logged in' })
     res.status(200).json({ message: `Welcom ${loggedUser.name}`, user: loggedUser.toObject({ getters: true }) });
 
 };
