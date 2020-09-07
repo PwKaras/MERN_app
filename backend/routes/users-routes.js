@@ -3,12 +3,15 @@ const express = require('express');
 const { check } = require('express-validator');
 
 const usersControlers = require('../controllers/users-controllers');
+const fileUpload = require('../middelweare/file-upload');
 
 const router = express.Router();
 
 router.get('/', usersControlers.getUsers);
 
 router.post('/signup',
+    //mullter
+    fileUpload.single('image'),
     [
         check('name')
             .not()

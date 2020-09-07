@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/validators';
+import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE, VALIDATOR_FILE } from '../../shared/util/validators';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import { useForm } from '../../shared/hooks/form-hook';
@@ -9,6 +9,7 @@ import { AuthContext } from '../../shared/context/auth-context';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import { useHttpClient } from '../../shared/hooks/http-hook';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 
 const Auth = () => {
     const auth = useContext(AuthContext);
@@ -31,6 +32,8 @@ const Auth = () => {
 
     const authSubminHandler = async event => {
         event.preventDefault();
+
+        console.log(formState.inputs);
         // setIsLoading(true);
 
         if (isLoginMode) {
@@ -142,7 +145,8 @@ const Auth = () => {
             setFormData(
                 {
                     ...formState.inputs,
-                    name: undefined
+                    name: undefined,
+                    image: undefined
                 },
                 formState.inputs.email.isValid && formState.inputs.password.isValid);
         } else {
@@ -151,6 +155,10 @@ const Auth = () => {
                     ...formState.inputs,
                     name: {
                         value: '',
+                        isValid: false
+                    },
+                    image: {
+                        value: null,
                         isValid: false
                     }
                 },
@@ -187,6 +195,15 @@ const Auth = () => {
                         // initialValid={formState.inputs.email.isValid}
                         />
                     }
+                    {!isLoginMode && <ImageUpload center
+                        id="image"
+                        element="input"
+                        type="file"
+                        label="image"
+                        validators={[VALIDATOR_FILE()]}
+                        errorText="Please add Your image."
+                        onInput={inputHandler}
+                    />}
                     <Input
                         id="email"
                         element="input"
