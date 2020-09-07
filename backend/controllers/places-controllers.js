@@ -92,6 +92,7 @@ const getPlacesById = async (req, res, next) => {
     //change Mongoose object data to JS.object and remove uderscore_ before id
     res.status(200).json({ place: place.toObject({ getters: true }) });
 };
+
 const updatePlacesById = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

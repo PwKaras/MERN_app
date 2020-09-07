@@ -8,13 +8,15 @@ import Card from '../../shared/components/UIElements/Card';
 import { AuthContext } from '../../shared/context/auth-context';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 const Auth = () => {
     const auth = useContext(AuthContext);
 
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
+    // const [isLoading, setIsLoading] = useState(false);
+    // const [error, setError] = useState();
+    const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
     const [formState, inputHandler, setFormData] = useForm({
         email: {
@@ -29,63 +31,106 @@ const Auth = () => {
 
     const authSubminHandler = async event => {
         event.preventDefault();
-        setIsLoading(true);
+        // setIsLoading(true);
 
         if (isLoginMode) {
             try {
-                const response = await fetch('http://localhost:5051/api/users/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                const responseData = await sendRequest('http://localhost:5051/api/users/login',
+                    'POST',
+                    JSON.stringify({
                         email: formState.inputs.email.value,
                         password: formState.inputs.password.value
-                    })
-                });
-                const responseData = await response.json();
-                if (!response.ok) {
-                    throw new Error(responseData.message);
-                };
-                setIsLoading(false);
-                auth.login();
+                    }),
+                    {
+                        'Content-Type': 'application/json'
+                    },
+                );
 
+                auth.login(responseData.user.id);
             } catch (error) {
-                setIsLoading(false);
-                setError(error.message || 'Something went wrong, please try again.');
+
             }
 
         } else {
             try {
-                const response = await fetch('http://localhost:5051/api/users/signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                const responseData = await sendRequest('http://localhost:5051/api/users/signup', 'POST',
+                    JSON.stringify({
                         name: formState.inputs.name.value,
                         email: formState.inputs.email.value,
                         password: formState.inputs.password.value
-                    })
-                });
+                    }),
+                    {
+                        'Content-Type': 'application/json'
+                    }
+                );
 
-                const responseData = await response.json();
-                // ok - property of response - fetch - ok it means 200
-                // !response.ok - response with 400 or 500 status
-                if (!response.ok) {
-                    throw new Error(responseData.message);
-
-                }
-                setIsLoading(false);
-                auth.login();
+                auth.login(responseData.user.id);
 
             } catch (error) {
-                console.log(error);
-                setIsLoading(false);
-                setError(error.message || 'Something went wrong, please try again.');
+
             }
+
         }
     };
+
+    //before useHttpClinet hook - pure fetch()
+    //     if (isLoginMode) {
+    //         try {
+    //             const response = await fetch('http://localhost:5051/api/users/login', {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify({
+    //                     email: formState.inputs.email.value,
+    //                     password: formState.inputs.password.value
+    //                 })
+    //             });
+    //             const responseData = await response.json();
+    //             if (!response.ok) {
+    //                 throw new Error(responseData.message);
+    //             };
+    //             setIsLoading(false);
+    //             auth.login();
+
+    //         } catch (error) {
+    //             setIsLoading(false);
+    //             setError(error.message || 'Something went wrong, please try again.');
+    //         }
+
+    //     } else {
+    //         try {
+    //             const response = await fetch('http://localhost:5051/api/users/signup', {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify({
+    //                     name: formState.inputs.name.value,
+    //                     email: formState.inputs.email.value,
+    //                     password: formState.inputs.password.value
+    //                 })
+    //             });
+
+    //             const responseData = await response.json();
+    //             // ok - property of response - fetch - ok it means 200
+    //             // !response.ok - response with 400 or 500 status
+    //             if (!response.ok) {
+    //                 throw new Error(responseData.message);
+
+    //             }
+    //             setIsLoading(false);
+    //             auth.login();
+
+    //         } catch (error) {
+    //             console.log(error);
+    //             setIsLoading(false);
+    //             setError(error.message || 'Something went wrong, please try again.');
+    //         }
+    //     }
+    // };
+
+    //pure React front only
     // const authSubminHandler = event => {
     //     event.preventDefault();
     //     console.log(formState.inputs);
@@ -114,14 +159,16 @@ const Auth = () => {
         setIsLoginMode(prevState => !prevState);
     };
 
-    const errorHandler = () => {
-        setError(null);
-    };
+    // const errorHandler = () => {
+    //     setError(null);
+    // };
+
+    /* {error} - state form useState  error */
+    /* <ErrorModal error={error} onClear={errorHandler} /> */
 
     return (
         <>
-            {/* {error} - state form useState  error */}
-            <ErrorModal error={error} onClear={errorHandler} />
+            <ErrorModal error={error} onClear={clearError} />
             <Card className="authentication">
                 {isLoading && <LoadingSpinner asOverlay />}
                 <h2>Login Required</h2>

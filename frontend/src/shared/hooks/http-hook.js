@@ -17,7 +17,7 @@ export const useHttpClient = () => {
         activeHttpRequests.current.push(httpAbortCtrll);
 
         try {
-            fetch(url, {
+            const response = await fetch(url, {
                 method,
                 body,
                 headers,
@@ -26,20 +26,26 @@ export const useHttpClient = () => {
             });
 
             const responseData = await response.json();
+
+            // clearing abortController belonging to function just compleated - line below keep every controller with out controller creating abowe
+            activeHttpRequests.current = activeHttpRequests.current.filter(reqCtrl => reqCtrl !== httpAbortCtrll);
+
             if (!response.ok) {
                 throw new Error(responseData.message);
             };
+            setIsLoading(false);
             return responseData;
 
         } catch (error) {
             setError(error.message || 'Something went wrong, please try again.');
+            setIsLoading(false);
+            throw error;
         }
-        setIsLoading(false);
     }, []);
     const clearError = () => {
         setError(null);
     };
-    useEffect(()=> {
+    useEffect(() => {
         return () => {
             activeHttpRequests.current.forEach(abortCtrll => abortCtrll.abort())
         };
