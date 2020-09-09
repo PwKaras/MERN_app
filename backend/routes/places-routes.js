@@ -4,28 +4,38 @@ const { check, body } = require('express-validator');
 
 const placesControllers = require('../controllers/places-controllers');
 
+const fileUpload = require('../middelweare/file-upload');
+const checkAuth = require('../middelweare/check-auth');
+
 const router = express.Router();
 
 router.get('/', placesControllers.getAllPlaces);
 
 router.get('/:pid', placesControllers.getPlacesById);
 
+router.get('/user/:uid', placesControllers.getPlacesByUserId);
+
+// code executed from top to bottom, so define jwt block access to next to all req which don`t fullfile requirement of this midleweare
+
+router.use(checkAuth);
+
+
 router.delete('/:pid', placesControllers.deletePlacesById);
 
 router.patch('/:pid',
-    [
-        body('newTitle')
-            .not()
-            .isEmpty(),
-        body('newDescription')
-            .isLength({ min: 3 })
-    ],
-    placesControllers.updatePlacesById);
+[
+    body('newTitle')
+    .not()
+    .isEmpty(),
+    body('newDescription')
+    .isLength({ min: 3 })
+],
+placesControllers.updatePlacesById);
 
-router.get('/user/:uid', placesControllers.getPlacesByUserId);
 
 router.post(
     '/',
+    fileUpload.single('image'),
     [check('title')
         .not()
         .isEmpty().

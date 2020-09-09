@@ -2,6 +2,8 @@
 const User = require('../models/user');
 
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const HttpError = require('../models/http-error');
 
@@ -24,7 +26,7 @@ const HttpError = require('../models/http-error');
 //     }
 // ];
 
-const defaultImage = 'https://picsum.photos/200';
+// const defaultImage = 'https://picsum.photos/200';
 
 const getUsers = async (req, res, next) => {
     let users;
@@ -51,7 +53,8 @@ const signup = async (req, res, next) => {
         return res.status(422).json(errors.array());
     };
 
-    const { name, email, password, img } = req.body;
+    const { name, email, password } = req.body;
+    // const { name, email, password, img } = req.body;
 
     let repetedEmail;
     try {
@@ -66,12 +69,26 @@ const signup = async (req, res, next) => {
         )
     };
 
+    let hashedPassword;
+    try {
+        //12 optimum - hard do hack, short time to generate
+        hashedPassword = await bcrypt.hash(password, 12);
+
+    } catch (err) {
+        const error = new HttpError('Could not create user, please try again.', 500
+        );
+        return next(error);
+    }
+
     const createdUser = new User({
         // id: uuid(),
         name,
         email,
-        password,
-        image: img || defaultImage,
+        password: hashedPassword,
+        image: req.file.path,
+        // when do like below, after changing port or host - problem - exact path is saved in dataBase(5051)
+        // image: `http://localhost:5051/${req.file.path}`,
+        // image: img || defaultImage,
         places: []
     });
 
@@ -81,8 +98,20 @@ const signup = async (req, res, next) => {
         return next(new HttpError('Creating new user failed, please try again later', 500));
     };
 
+    let token;
+    try {
+        // first argument - payload - data to encode in token
+        // second string - supers secret code, only to know of server
+        // third- token configuration IMPORTANT - lmit expiration as safty rule
+        token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, 'funy_desert_meal', { expiresIn: '1h' });
+    } catch (error) {
+        const err = new HttpError('Signing up failed, please try again later.', 500)
+    };
+
     // USERS.push(createdUser);
-    res.status(201).json({ user: createdUser.toObject({ getters: true }), message: `Welcome ${name}` });
+    // not send back all data, extract only this necessary in front
+    res.status(201).json({ userId: createdUser.id, email: createdUser.email, token: token, message: `Welcome ${name}` });
+    // res.status(201).json({ user: createdUser.toObject({ getters: true }), message: `Welcome ${name}` });
 };
 
 const login = async (req, res, next) => {
@@ -100,12 +129,41 @@ const login = async (req, res, next) => {
     //     return u.email === email && u.password === password
     // });
 
-    if (!loggedUser || loggedUser.password !== password) {
+    if (!loggedUser) {
         return next(
-            new HttpError('User email or password are not correct or not exist, crudential seems to be wrong.', 401));
+            new HttpError('User email or password are not correct or not exist, credential seems to be wrong.', 401));
     };
-    // res.json({ message: 'Logged in' })
-    res.status(200).json({ message: `Welcom ${loggedUser.name}`, user: loggedUser.toObject({ getters: true }) });
+
+    let isValidPassword = false;
+    try {
+        //  compare password extracted from req.body and existing users (with this email) password
+        isValidPassword = await bcrypt.compare(password, loggedUser.password);
+    } catch (err) {
+        return next(
+            new HttpError('Could not log you in, please check your credentials and try again.', 500)
+        )
+    };
+
+    if (!isValidPassword) {
+        const error = new HttpError('User email or password are not correct or not exist, crudential seems to be wrong.', 401)
+    }
+
+    let token;
+    try {
+        token = jwt.sign(
+            { userId: loggedUser.id, email: loggedUser.email }, 'funy_desert_meal',
+            { expiresIn: '1h' });
+    } catch (error) {
+        const err = new HttpError('Signing up failed, please try again later.', 500)
+    };
+
+    // res.json({ message: 'Logged in' }) 
+    res.json({
+        userId: loggedUser.id,
+        email: loggedUser.email,
+        token: token
+    });
+    // res.status(200).json({ message: `Welcom ${loggedUser.name}`, user: loggedUser.toObject({ getters: true }) });
 
 };
 

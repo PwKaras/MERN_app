@@ -33,7 +33,7 @@ const Auth = () => {
     const authSubminHandler = async event => {
         event.preventDefault();
 
-        console.log(formState.inputs);
+        // console.log(formState.inputs);
         // setIsLoading(true);
 
         if (isLoginMode) {
@@ -49,25 +49,39 @@ const Auth = () => {
                     },
                 );
 
-                auth.login(responseData.user.id);
+                auth.login(responseData.userId, responseData.token);
+                // auth.login(responseData.user.id);
             } catch (error) {
 
             }
 
         } else {
             try {
-                const responseData = await sendRequest('http://localhost:5051/api/users/signup', 'POST',
-                    JSON.stringify({
-                        name: formState.inputs.name.value,
-                        email: formState.inputs.email.value,
-                        password: formState.inputs.password.value
-                    }),
-                    {
-                        'Content-Type': 'application/json'
-                    }
+                // FormData - browser API
+                const formData = new FormData();
+                formData.append('email', formState.inputs.email.value);
+                formData.append('name', formState.inputs.name.value);
+                formData.append('password', formState.inputs.password.value);
+                // corespond with fileUpload.single('image') from user-routes backend
+                formData.append('image', formState.inputs.image.value)
+                const responseData = await sendRequest('http://localhost:5051/api/users/signup', 'POST', formData
                 );
+                // const responseData = await sendRequest('http://localhost:5051/api/users/signup', 'POST',
+                //     // formData automaticly have well headers
+                // formData
+                // // JSON.stringify({
+                //     //     name: formState.inputs.name.value,
+                //     //     email: formState.inputs.email.value,
+                //     //     password: formState.inputs.password.value
+                //     // }),
+                //     // {
+                //     //     'Content-Type': 'application/json'
+                //     // }
+                // );
 
-                auth.login(responseData.user.id);
+                // token - userId - user-controllers -signup and login
+                auth.login(responseData.userId, responseData.token);
+                // auth.login(responseData.user.id);
 
             } catch (error) {
 

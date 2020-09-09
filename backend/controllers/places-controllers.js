@@ -3,6 +3,7 @@
 
 
 const { validationResult } = require(`express-validator`);
+const fs = require('fs');
 
 const HttpError = require('../models/http-error');
 
@@ -184,7 +185,8 @@ const createPlace = async (req, res, next) => {
             description,
             address,
             location: coordinates,
-            image: 'https://picsum.photos/200',
+            image: req.file.path,
+            // image: 'https://picsum.photos/200',
             creator
         });
 
@@ -248,7 +250,7 @@ const deletePlacesById = async (req, res, next) => {
         return next(err);
     };
 
-
+    const imagePath = place.image;
     try {
         const sess = await mongoose.startSession();
         console.log(sess);
@@ -262,6 +264,9 @@ const deletePlacesById = async (req, res, next) => {
         return next(new HttpError('Deleting places failed, please try again later.', 500))
     };
 
+    fs.unlink(imagePath, (error) => {
+        console.log(error);
+    })
     // const index = DEF_PLACES.indexOf(place);
     // DEF_PLACES.splice(index, 1);
     // res.status(200).json({ message: 'Deleted place.' });

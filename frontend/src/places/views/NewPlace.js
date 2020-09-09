@@ -4,12 +4,13 @@ import { useForm } from '../../shared/hooks/form-hook';
 // import { useCallback, useReducer } from 'react';
 // taked to new hook
 import Input from '../../shared/components/FormElements/Input';
-import { VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH } from '../../shared/util/validators';
+import { VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH, VALIDATOR_FILE } from '../../shared/util/validators';
 import Button from '../../shared/components/FormElements/Button';
 import './PlaceForm.css';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import { AuthContext } from '../../shared/context/auth-context';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 
 
 
@@ -60,6 +61,10 @@ const NewPlace = () => {
             address: {
                 value: '',
                 isValid: false
+            },
+            image: {
+                value: null,
+                isValid: false
             }
         }, false
     );
@@ -99,18 +104,32 @@ const NewPlace = () => {
         event.preventDefault();
         setIsLoading(true);
         try {
+            const formData = new FormData();
+            formData.append('title', formState.inputs.title.value);
+            formData.append('description', formState.inputs.description.value);
+            formData.append('address', formState.inputs.address.value);
+            formData.append('creator', auth.userId);
+            formData.append('image', formState.inputs.image.value)
             const response = await fetch('http://localhost:5051/api/places', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    // look check-auth.js Bearrer +' '+token
+                    Authorization: 'Bearer ' + auth.token
                 },
-                body: JSON.stringify({
-                    title: formState.inputs.title.value,
-                    description: formState.inputs.description.value,
-                    address: formState.inputs.address.value,
-                    creator: auth.userId
-                })
+                body: formData
             });
+            // const response = await fetch('http://localhost:5051/api/places', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         title: formState.inputs.title.value,
+            //         description: formState.inputs.description.value,
+            //         address: formState.inputs.address.value,
+            //         creator: auth.userId
+            //     })
+            // });
 
             const responseData = await response.json();
 
@@ -150,6 +169,16 @@ const NewPlace = () => {
                     label="Title"
                     validators={[VALIDATOR_REQUIRE()]}
                     errorText="Please enter a valid title."
+                    onInput={inputHandler}
+                />
+                <ImageUpload
+                    center
+                    id="image"
+                    element="input"
+                    type="file"
+                    label="image"
+                    validators={[VALIDATOR_FILE()]}
+                    errorText="Please add new place`s image."
                     onInput={inputHandler}
                 />
                 <Input

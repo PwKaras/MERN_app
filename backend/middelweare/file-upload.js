@@ -1,5 +1,5 @@
 const multer = require('multer');
-const uuid = require('uuid/v1');
+const {v1: uuidv1} = require('uuid');
 
 // specify right extension
 const MIME_TYPE_MAP = {
@@ -14,7 +14,7 @@ const fileUpload = multer({
     limits: 500000,
     //how data should sotrage
     storage: multer.diskStorage({
-        destination: (req, file, cd) => {
+        destination: (req, file, cb) => {
             //error or null and path where store files (folders path)
             cb(null, 'uploads/images');
 
@@ -24,7 +24,7 @@ const fileUpload = multer({
             const ext = MIME_TYPE_MAP[file.mimetype]
             //as callBack cb two arguments error or null as first
             // second file name with unique id and corect extension
-            cb(null, uuid() + '.' + ext);
+            cb(null, uuidv1() + '.' + ext);
         }
     }),
     fileFilter: (req, file, cb) => {
@@ -33,6 +33,7 @@ const fileUpload = multer({
         const isValid = !!MIME_TYPE_MAP[file.mimetype];
         let error = isValid ? null : new Error(`Invalid mimie type!`);
         //second argument always boolean
+
         cb(error, isValid);
     }
 });

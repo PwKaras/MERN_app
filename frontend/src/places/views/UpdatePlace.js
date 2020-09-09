@@ -96,7 +96,8 @@ const UpdatePlace = () => {
             const response = await fetch(`http://localhost:5051/api/places/${updatePlaceId}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth.token
                 },
                 body: JSON.stringify({
                     newTitle: formState.inputs.title.value,
