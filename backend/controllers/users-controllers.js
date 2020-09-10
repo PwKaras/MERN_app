@@ -131,7 +131,7 @@ const login = async (req, res, next) => {
 
     if (!loggedUser) {
         return next(
-            new HttpError('User email or password are not correct or not exist, credential seems to be wrong.', 401));
+            new HttpError('User email or password are not correct or not exist, credential seems to be wrong.', 403));
     };
 
     let isValidPassword = false;
@@ -145,7 +145,7 @@ const login = async (req, res, next) => {
     };
 
     if (!isValidPassword) {
-        const error = new HttpError('User email or password are not correct or not exist, crudential seems to be wrong.', 401)
+        const error = new HttpError('User email or password are not correct or not exist, crudential seems to be wrong.', 403)
     }
 
     let token;

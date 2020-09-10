@@ -104,6 +104,22 @@ const updatePlacesById = async (req, res, next) => {
     const { newTitle, newDescription } = req.body;
     const placeId = req.params.pid;
 
+    let place;
+    try {
+        place = await Place.findById(placeId);
+    } catch (error) {
+        return next(new HttpError('Fetching places failed, please try again later.', 500));
+    };
+
+    // models for place - has creator field stored creator Id WATCH OUT - is not string but spetial object Mongoose type NECESSARY convert to string
+    // check-auth.js stored in req.userData userId equal decodedToken.userId
+    if (place.creator.toString() !== req.userData.userId) {
+        const error = new HttpError(
+            'You are not allowed to edit this place.', 401
+        );
+        return next(error);
+    };
+
     let updatedPlace;
     try {
         updatedPlace = await Place.updateOne({ _id: placeId }, { title: newTitle, description: newDescription });
@@ -124,12 +140,6 @@ const updatePlacesById = async (req, res, next) => {
     //assing succesfully changed data in copy, to existing object
     // DEF_PLACES[placeIndex] = updatedPlace;
 
-    let place;
-    try {
-        place = await Place.findById(placeId);
-    } catch (error) {
-        return next(new HttpError('Fetching places failed, please try again later.', 500));
-    }
 
     if (!updatedPlace) {
         return next(new HttpError('Could not find a place for the provided id.', 404));
@@ -239,10 +249,17 @@ const deletePlacesById = async (req, res, next) => {
 
     try {
         place = await Place.findById(placeId).populate('creator');
-        console.log(place);
     } catch (error) {
         const err = res.status(500).json('Fetching place failed, please try again');
         return next(err);
+    };
+
+    // with populate above creator have all user data
+    if (place.creator.id !== req.userData.userId) {
+        const error = new HttpError(
+            'You are not allowed to delete this place.', 401
+        );
+        return next(error);
     };
 
     if (!place) {

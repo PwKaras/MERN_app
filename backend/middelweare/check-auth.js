@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
         //after have veryfy token - next() (whitout return) don`t stop req and allows to req go to the next routes - access for veryfied users  
         next();
     } catch (error) {
-        const err = new HttpError('Authentication failed!', 401);
+        const err = new HttpError('Authentication failed!', 403);
         return next(err);
     }
 };
