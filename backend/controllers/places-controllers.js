@@ -180,7 +180,9 @@ const createPlace = async (req, res, next) => {
         );
     };
 
-    const { title, description, address, creator } = req.body;
+    // const { title, description, address, creator } = req.body;
+    // with token do not give possibillity to send fake creatorId form Front and better extract form Back
+    const { title, description, address } = req.body;
 
     let coordinates;
     try {
@@ -197,13 +199,17 @@ const createPlace = async (req, res, next) => {
             location: coordinates,
             image: req.file.path,
             // image: 'https://picsum.photos/200',
-            creator
+            // taked from check-auth
+            creator: req.userData.userId
         });
 
     let user;
 
     try {
-        user = await User.findById({ _id: creator })
+        user = await User.findById(
+            req.userData.userId
+            // { _id: creator }
+        )
     } catch (error) {
         const err = res.status(500).json('Fetching user failed, please try again');
         return next(err);
@@ -286,8 +292,9 @@ const deletePlacesById = async (req, res, next) => {
     })
     // const index = DEF_PLACES.indexOf(place);
     // DEF_PLACES.splice(index, 1);
-    // res.status(200).json({ message: 'Deleted place.' });
-    res.status(200).json({ place: place.toObject({ getters: true }), message: `Place with Id: ${placeId} has been deleted` });
+    // avoid to return object with userId
+    // res.status(200).json({ place: place.toObject({ getters: true }), message: `Place with Id: ${placeId} has been deleted` });
+    res.status(200).json({ message: 'Deleted place.' });
 };
 
 

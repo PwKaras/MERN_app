@@ -33,7 +33,7 @@ const getUsers = async (req, res, next) => {
 
     try {
         // insted exclude (minus) email '-email', could indicate what exact get i.e. 'name image'
-        users = await User.find({}, '-email');
+        users = await User.find({}, '-password');
     } catch (error) {
         const err = res.status(500).json({ message: 'Could not get users, please try again leater.' });
         return next(err);
