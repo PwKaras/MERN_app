@@ -1,11 +1,10 @@
-import React, { useState, useContext, useEffect, useCallback } from 'react';
+import React, { useState, useContext } from 'react';
 import Card from '../../shared/components/UIElements/Card';
 import Button from '../../shared/components/FormElements/Button';
 import Modal from '../../shared/components/UIElements/Modal';
 import Map from '../../shared/components/UIElements/Map';
 import { AuthContext } from '../../shared/context/auth-context';
 import './PlaceItem.css';
-import { useParams } from 'react-router-dom';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import { useHttpClient } from '../../shared/hooks/http-hook';
@@ -13,11 +12,7 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 
 const PlaceItem = props => {
     const auth = useContext(AuthContext);
-    const userId = useParams().userId;
     const { isLoading, error, sendRequest, clearError } = useHttpClient();
-    // const [isLoading, setIsLoading] = useState(true);
-    // const [error, setError] = useState();
-
 
     const [showMap, setShowMap] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -33,51 +28,13 @@ const PlaceItem = props => {
         try {
             await sendRequest(
                 `http://localhost:5051/api/places/${props.id}`,
-                'DELETE', 
-                // null - no body
+                'DELETE',
                 null,
-                {Authorization: 'Bearer ' + auth.token}
+                { Authorization: 'Bearer ' + auth.token }
             );
             props.onDelete(props.id);
         } catch (err) { }
     };
-
-
-
-    //   infinitive loop - useEffect or useCalback
-    // const {onDelete, id}= props;
-    // const confirmDeleteHandler =
-    //     useCallback(() => {
-    //         const fetchDeletedPlace = async () => {
-
-    //             setShowConfirmModal(false);
-    //             // console.log('DELITING...');
-
-
-    //             setIsLoading(true);
-    //             try {
-    //                 const response = await fetch(`http://localhost:5051/api/places/${id}`, { method: 'DELETE' });
-    //                 const responseData = await response.json();
-    //                 if (!response.ok) {
-    //                     throw new Error(responseData.message);
-    //                 };
-    //                 setIsLoading(false);
-    //                 onDelete(id);
-    //                 return
-    //             } catch (error) {
-    //                 setError(error.message);
-    //                 setIsLoading(false);
-    //             }
-    //             fetchDeletedPlace();
-    //         }
-    //     }
-    //         , [onDelete,id]
-    //     );
-
-
-    // const clearError = () => {
-    //     setError(null);
-    // };
 
     return (
         <>
@@ -122,15 +79,17 @@ const PlaceItem = props => {
                     <div className="place-item__actions">
                         <Button inverse onClick={openMapHandler}>VIEW ON MAP</Button>
                         {
-                            // auth.userId === props.creatorId &&
-                            auth.userId === userId
+                            auth.userId === props.creatorID
                             && (
-                                <>
-                                    <Button to={`/places/${props.id}`}>EDIT</Button>
-                                    <Button danger
-                                        onClick={showDeleteWarningHandler}
-                                    >DELETE</Button>
-                                </>
+
+                                <Button to={`/places/${props.id}`}>EDIT</Button>
+                            )}
+                        {
+                            auth.userId === props.creatorID
+                            && (
+                                <Button danger
+                                    onClick={showDeleteWarningHandler}
+                                >DELETE</Button>
                             )}
                     </div>
                 </Card>

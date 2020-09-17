@@ -13,10 +13,9 @@ import './App.css';
 
 const App = () => {
 
-  const [token, login, logout, userId] = useAuth();
+  const {token, login, logout, userId} = useAuth();
   let routes;
 
-  // if (isLoggedIn) {
   if (token) {
     routes = (
       <Switch>
@@ -52,7 +51,6 @@ const App = () => {
     );
   }
 
-  // !!token convert token to boolean true false
   return (
     <AuthContext.Provider value={{
       isLoggedIn: !!token,

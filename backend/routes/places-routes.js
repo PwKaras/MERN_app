@@ -15,10 +15,7 @@ router.get('/:pid', placesControllers.getPlacesById);
 
 router.get('/user/:uid', placesControllers.getPlacesByUserId);
 
-// code executed from top to bottom, so define jwt block access to next to all req which don`t fullfile requirement of this midleweare
-
 router.use(checkAuth);
-
 
 router.delete('/:pid', placesControllers.deletePlacesById);
 

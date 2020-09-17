@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 const placeSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    // working with database image is always URL - question of executing queries as fast as possible
     image: { type: String, required: true },
     address: { type: String, required: true },
     location: {

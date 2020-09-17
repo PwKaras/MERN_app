@@ -9,20 +9,7 @@ import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import { AuthContext } from '../../shared/context/auth-context';
 
-// import { DEF_PLACES } from './UserPlaces';
-// import PlaceList from '../components/PlaceList';
 
-
-// FILTER - map
-// const UpdatePlace = () => {
-// const updatePlaceId = useParams().updatePlaceId
-// const UpdatePlace = DEF_PLACES.filter(place => place.id === updatePlaceId);
-// return (
-//         <PlaceList items={UpdatePlace} />
-//     );
-// };
-
-// FIND - don`t have map
 const UpdatePlace = () => {
     const [updatePlace, setUpdatePlace] = useState();
     const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +29,6 @@ const UpdatePlace = () => {
         }
     }, false)
 
-    //    const updatePlace = DEF_PLACES.find(place => place.id === updatePlaceId);
 
     useEffect(() => {
         const fetchPlace = async () => {
@@ -72,22 +58,6 @@ const UpdatePlace = () => {
         fetchPlace();
     }, [updatePlaceId, setFormData]);
 
-
-    // useEffect(() => {
-    //     if (updatePlace) {
-    //         setFormData({
-    //             title: {
-    //                 value: updatePlace.title,
-    //                 isValid: true
-    //             },
-    //             description: {
-    //                 value: updatePlace.description,
-    //                 isValid: true
-    //             }
-    //         }, true);
-    //     }
-    //     setIsLoading(false);
-    // }, [setFormData, updatePlace]);
 
     const placeUpdateSubmitHandler = async event => {
         event.preventDefault();
@@ -137,50 +107,6 @@ const UpdatePlace = () => {
     };
 
 
-
-
-    // pure React
-    // const updatePlace = DEF_PLACES.find(place => place.id === updatePlaceId);
-
-    // useEffect(() => {
-    //     if (updatePlace) {
-    //         setFormData({
-    //             title: {
-    //                 value: updatePlace.title,
-    //                 isValid: true
-    //             },
-    //             description: {
-    //                 value: updatePlace.description,
-    //                 isValid: true
-    //             }
-    //         }, true);
-    //     }
-    //     setIsLoading(false);
-    // }, [setFormData, updatePlace]);
-
-    // const placeUpdateSubmitHandler = event => {
-    //     event.preventDefault();
-    //     console.log(formState.inputs)
-    // };
-
-
-    // if (!updatePlace) {
-    //     return (
-    //         <div className="center">
-    //             <Card><h2>Could not find place
-    //                 </h2></Card>
-    //         </div>
-    //     )
-    // };
-
-    // if (isLoading) {
-    //     return (
-    //         <div className="center">
-    //             <h2>Loading...</h2>
-    //         </div>
-    //     );
-    // };
-
     return (
         <>
             <ErrorModal error={error} onClear={errorHandler} />
@@ -196,9 +122,6 @@ const UpdatePlace = () => {
                         onInput={inputHandler}
                         initialValue={updatePlace.title}
                         initialValid={true}
-                    // taked from useForm
-                    // initialValue={formState.inputs.title.value}
-                    // initialValid={formState.inputs.title.isValid}
                     />
                     <Input
                         id="description"
@@ -209,9 +132,6 @@ const UpdatePlace = () => {
                         onInput={inputHandler}
                         initialValue={updatePlace.description}
                         initialValid={true}
-                    // taked from useForm hook
-                    // initialValue={formState.inputs.description.value}
-                    // initialValid={formState.inputs.description.isValid}
                     />
                     <Button type="submit" disabled={!formState.isValid}>UPDATE PLACE</Button>
                 </form>

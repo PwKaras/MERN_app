@@ -15,8 +15,6 @@ const Auth = () => {
     const auth = useContext(AuthContext);
 
     const [isLoginMode, setIsLoginMode] = useState(true);
-    // const [isLoading, setIsLoading] = useState(false);
-    // const [error, setError] = useState();
     const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
     const [formState, inputHandler, setFormData] = useForm({
@@ -33,9 +31,6 @@ const Auth = () => {
     const authSubminHandler = async event => {
         event.preventDefault();
 
-        // console.log(formState.inputs);
-        // setIsLoading(true);
-
         if (isLoginMode) {
             try {
                 const responseData = await sendRequest('http://localhost:5051/api/users/login',
@@ -50,11 +45,8 @@ const Auth = () => {
                 );
 
                 auth.login(responseData.userId, responseData.token);
-                // auth.login(responseData.user.id);
             } catch (error) {
-
             }
-
         } else {
             try {
                 // FormData - browser API
@@ -62,97 +54,17 @@ const Auth = () => {
                 formData.append('email', formState.inputs.email.value);
                 formData.append('name', formState.inputs.name.value);
                 formData.append('password', formState.inputs.password.value);
-                // corespond with fileUpload.single('image') from user-routes backend
                 formData.append('image', formState.inputs.image.value)
                 const responseData = await sendRequest('http://localhost:5051/api/users/signup', 'POST', formData
                 );
-                // const responseData = await sendRequest('http://localhost:5051/api/users/signup', 'POST',
-                //     // formData automaticly have well headers
-                // formData
-                // // JSON.stringify({
-                //     //     name: formState.inputs.name.value,
-                //     //     email: formState.inputs.email.value,
-                //     //     password: formState.inputs.password.value
-                //     // }),
-                //     // {
-                //     //     'Content-Type': 'application/json'
-                //     // }
-                // );
 
-                // token - userId - user-controllers -signup and login
                 auth.login(responseData.userId, responseData.token);
-                // auth.login(responseData.user.id);
 
             } catch (error) {
 
             }
-
         }
     };
-
-    //before useHttpClinet hook - pure fetch()
-    //     if (isLoginMode) {
-    //         try {
-    //             const response = await fetch('http://localhost:5051/api/users/login', {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Content-Type': 'application/json'
-    //                 },
-    //                 body: JSON.stringify({
-    //                     email: formState.inputs.email.value,
-    //                     password: formState.inputs.password.value
-    //                 })
-    //             });
-    //             const responseData = await response.json();
-    //             if (!response.ok) {
-    //                 throw new Error(responseData.message);
-    //             };
-    //             setIsLoading(false);
-    //             auth.login();
-
-    //         } catch (error) {
-    //             setIsLoading(false);
-    //             setError(error.message || 'Something went wrong, please try again.');
-    //         }
-
-    //     } else {
-    //         try {
-    //             const response = await fetch('http://localhost:5051/api/users/signup', {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Content-Type': 'application/json'
-    //                 },
-    //                 body: JSON.stringify({
-    //                     name: formState.inputs.name.value,
-    //                     email: formState.inputs.email.value,
-    //                     password: formState.inputs.password.value
-    //                 })
-    //             });
-
-    //             const responseData = await response.json();
-    //             // ok - property of response - fetch - ok it means 200
-    //             // !response.ok - response with 400 or 500 status
-    //             if (!response.ok) {
-    //                 throw new Error(responseData.message);
-
-    //             }
-    //             setIsLoading(false);
-    //             auth.login();
-
-    //         } catch (error) {
-    //             console.log(error);
-    //             setIsLoading(false);
-    //             setError(error.message || 'Something went wrong, please try again.');
-    //         }
-    //     }
-    // };
-
-    //pure React front only
-    // const authSubminHandler = event => {
-    //     event.preventDefault();
-    //     console.log(formState.inputs);
-    //     auth.login();
-    // };
 
     const switchModeHandler = () => {
         if (!isLoginMode) {
@@ -181,13 +93,6 @@ const Auth = () => {
         setIsLoginMode(prevState => !prevState);
     };
 
-    // const errorHandler = () => {
-    //     setError(null);
-    // };
-
-    /* {error} - state form useState  error */
-    /* <ErrorModal error={error} onClear={errorHandler} /> */
-
     return (
         <>
             <ErrorModal error={error} onClear={clearError} />
@@ -205,8 +110,6 @@ const Auth = () => {
                             validators={[VALIDATOR_REQUIRE()]}
                             errorText="Please enter a name."
                             onInput={inputHandler}
-                        // initialValue={formState.inputs.email.value}
-                        // initialValid={formState.inputs.email.isValid}
                         />
                     }
                     {!isLoginMode && <ImageUpload center
@@ -226,8 +129,6 @@ const Auth = () => {
                         validators={[VALIDATOR_REQUIRE(), VALIDATOR_EMAIL()]}
                         errorText="Please enter a valid email address."
                         onInput={inputHandler}
-                    // initialValue={formState.inputs.email.value}
-                    // initialValid={formState.inputs.email.isValid}
                     />
                     <Input
                         id="password"
@@ -237,8 +138,6 @@ const Auth = () => {
                         validators={[VALIDATOR_REQUIRE(), VALIDATOR_MINLENGTH(8)]}
                         errorText="Please enter a valid password (at least 8 characters)."
                         onInput={inputHandler}
-                    // initialValue={formState.inputs.password.value}
-                    // initialValid={formState.inputs.password.isValid}
                     />
                     <Button type="submit" disabled={!formState.isValid}>
                         {isLoginMode ? "LOGIN" : "SINGUP"}

@@ -32,11 +32,9 @@ const { value, isValid } = inputState;
 
 
 useEffect(
-    // function that should be executed
     () => {
         onInput(id, value, isValid)
     },
-    // array of dependencies (things that triger this funcition) 
     [id, value, isValid, onInput]);
 
     const changeHandler = event => {
