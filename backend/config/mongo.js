@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
-const mongoConnect = mongoose.connect(process.env.MONGO_DB, {
+const mongoConnect = mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.asa7a.mongodb.net/${process.env.DB_Name}?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
     useCreateIndex: true
 }).then(() => {
-    console.log(`connected ${process.env.MONGO_DB}`)
+    console.log(`connected mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.asa7a.mongodb.net/${process.env.DB_Name}?retryWrites=true&w=majority`)
 });
 
 module.exports = mongoConnect

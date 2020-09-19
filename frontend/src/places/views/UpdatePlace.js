@@ -34,7 +34,8 @@ const UpdatePlace = () => {
         const fetchPlace = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`http://localhost:5051/api/places/${updatePlaceId}`);
+                const response = await fetch(`
+                ${process.env.REACT_APP_BACKEND_URL}/places/${updatePlaceId}`);
                 const responseData = await response.json();
                 if (!response.ok) {
                     throw new Error(responseData.message);
@@ -63,7 +64,7 @@ const UpdatePlace = () => {
         event.preventDefault();
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost:5051/api/places/${updatePlaceId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/places/${updatePlaceId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

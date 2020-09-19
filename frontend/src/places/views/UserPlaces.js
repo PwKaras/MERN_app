@@ -14,7 +14,7 @@ const UserPlaces = () => {
         const fetchPlaces = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`http://localhost:5051/api/places/user/${userId}`);
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`);
                 const responseData = await response.json();
                 if (!response.ok) {
                     throw new Error(responseData.message);
