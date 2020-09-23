@@ -10,6 +10,7 @@ const placesRoutes = require('./routes/places-routes');
 const usersRouter = require('./routes/users-routes');
 
 const HttpError = require('./models/http-error');
+const { profileEnd } = require('console');
 
 const app = express();
 
@@ -46,10 +47,11 @@ app.use((error, req, res, next) => {
     res.json({ message: error.message || 'An unknown error occured!' });
 });
 
-
+const LOCAL_PORT = process.env.LOCAL_PORT;
+const LOCAL_HOST = process.env.LOCAL_HOST;
 const PORT = process.env.PORT;
 const HOST = process.env.HOST;
 
-app.listen(PORT, HOST, () => {
-    console.log(`Listening on http://${HOST}:${PORT}`)
+app.listen(PORT || LOCAL_PORT , LOCAL_HOST, () => {
+    console.log(`Listening on http://${LOCAL_HOST}:${PORT || LOCAL_PORT}`)
 });
